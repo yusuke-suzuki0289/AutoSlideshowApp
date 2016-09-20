@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     int judge = 0; //判定用変数
     private Cursor cursor; //メンバ変数として宣言
-//    Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成
+    Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -39,7 +39,18 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // ボタンの取得とリスナーの登録(必ずOnclickの外で定義する→基本的にはOnCreate)
+        Button button1 = (Button) findViewById(R.id.button1);
+        button1.setOnClickListener(this);
 
+        Button button2 = (Button) findViewById(R.id.button2);
+        button2.setOnClickListener(this);
+
+        Button button3 = (Button) findViewById(R.id.button3);
+        button3.setOnClickListener(this);
+
+        Button button4 = (Button) findViewById(R.id.button4);
+        button4.setOnClickListener(this);
 
         //パーミッションを表示する（Android 6.0以降の場合）
         // Android 6.0以降の場合
@@ -77,20 +88,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     //初期画像表示
     public void getContentsInfo() {
-
-        // ボタンの取得とリスナーの登録(必ずOnclickの外で定義する)
-        Button button1 = (Button) findViewById(R.id.button1);
-        button1.setOnClickListener(this);
-
-        Button button2 = (Button) findViewById(R.id.button2);
-        button2.setOnClickListener(this);
-
-        Button button3 = (Button) findViewById(R.id.button3);
-        button3.setOnClickListener(this);
-
-        final Button button4 = (Button) findViewById(R.id.button4);
-        button4.setOnClickListener(this);
-
         // indexからIDを取得し、そのIDから画像のURIを取得する
         // URIとは目的のデータを示すために使われるもの。PCであればファイルをディレクトリで指定するが、AndroidではURIで指定する感じ。
         // 画像の情報URIを全件取得する
@@ -128,38 +125,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             setImageURI();
 
         } else if (judge == 4) {
-            String buttontxt4 = button4.getText().toString(); //入力文字の取得
-            Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成　→　クリックされる時点ではインスタンス生成されないため、MainActivity配下に移動
-            if(buttontxt4.equals("再生")) {
-//              Handler handler = new Handler(); //エラーとなるためコメントアウト
-                long period = 2; //タイマーの秒数をローカル変数として宣言
-                button1.setEnabled(false);//ボタン1無効化
-                button2.setEnabled(false);//ボタン2無効化
-                button3.setEnabled(false);//ボタン3無効化
-                button4.setText("停止");  //ボタン4の名称を「停止」に変更
-                    timer.schedule(new TimerTask() {
-                    @Override
-                        public void run() {
-                            button4.post(new Runnable() {
-                                public void run() {
-                                    if (cursor.isLast() == true) {
-                                        cursor.moveToFirst();
-                                    } else {
-                                        cursor.moveToNext();
-                                    }
-                                    setImageURI();
-                                    return;
-                                }
-                            });
-                        }
-                    },2, period);
-            }else{
-                button1.setEnabled(true);//ボタン1無効化
-                button2.setEnabled(true);//ボタン2無効化
-                button3.setEnabled(true);//ボタン3無効化
-                button4.setText("再生");  //ボタン名「再生」に変更
-                timer.cancel();
+            if (cursor.isLast() == true) {
+                cursor.moveToFirst();
+            } else {
+                cursor.moveToNext();
             }
+            setImageURI();
         }
     }
 
@@ -196,6 +167,38 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             //再生ボタンが押された場合
         } else if (v.getId() == R.id.button4) {
             judge = 4;
+            Button button1 = (Button) findViewById(R.id.button1);
+            Button button2 = (Button) findViewById(R.id.button2);
+            Button button3 = (Button) findViewById(R.id.button3);
+            final Button button4 = (Button) findViewById(R.id.button4);
+
+            String buttontxt4 = button4.getText().toString(); //入力文字の取得
+//            Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成　→　クリックされる時点ではインスタンス生成されないため、MainActivity配下に移動
+            if(buttontxt4.equals("再生")) {
+//              Handler handler = new Handler(); //エラーとなるためコメントアウト
+                long period = 2; //タイマーの秒数をローカル変数として宣言
+                button1.setEnabled(false);//ボタン1無効化
+                button2.setEnabled(false);//ボタン2無効化
+                button3.setEnabled(false);//ボタン3無効化
+                button4.setText("停止");  //ボタン4の名称を「停止」に変更
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        button4.post(new Runnable() {
+                            public void run() {
+                                getContentsInfo();
+                                return;
+                            }
+                        });
+                    }
+                },2, period);
+            }else{
+                button1.setEnabled(true);//ボタン1無効化
+                button2.setEnabled(true);//ボタン2無効化
+                button3.setEnabled(true);//ボタン3無効化
+                button4.setText("再生");  //ボタン名「再生」に変更
+                timer.cancel();
+            }
             getContentsInfo();
             Log.d("javatest","ボタン４");
         }
