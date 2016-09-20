@@ -19,15 +19,14 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     int judge = 0; //判定用変数
     private Cursor cursor; //メンバ変数として宣言
-
+    Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -39,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         //パーミッションを表示する（Android 6.0以降の場合）
         // Android 6.0以降の場合
@@ -121,12 +122,12 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         } else if (judge == 4) {
             String buttontxt4 = button4.getText().toString(); //入力文字の取得
 
-            Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成
-            timer = null;
+//            Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成　→　クリックされる時点ではインスタンス生成されないため、MainActivity配下に移動
 
             if(buttontxt4.equals("再生")) {
 //              Handler handler = new Handler(); //エラーとなるためコメントアウト
                 long period = 2; //タイマーの秒数をローカル変数として宣言
+                button4.setText("停止");  //ボタンに名「停止」に変更
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -134,12 +135,11 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                             public void run() {
                                 cursor.moveToNext();
                                 setImageURI();
-                                button4.setText("停止");  //ボタンに名「停止」に変更
                                 return;
                             }
                         });
                     }
-                }, null, period);
+                }, 0, period);
             }else{
                 timer.cancel();
             }
