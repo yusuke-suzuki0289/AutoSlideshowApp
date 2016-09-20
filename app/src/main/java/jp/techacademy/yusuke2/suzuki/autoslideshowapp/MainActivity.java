@@ -19,6 +19,8 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
@@ -85,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         Button button3 = (Button) findViewById(R.id.button3);
         button3.setOnClickListener(this);
 
-        Button button4 = (Button) findViewById(R.id.button4);
+        final Button button4 = (Button) findViewById(R.id.button4);
         button4.setOnClickListener(this);
 
         // indexからIDを取得し、そのIDから画像のURIを取得する
@@ -118,16 +120,24 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
         } else if (judge == 4) {
             String buttontxt4 = button4.getText().toString(); //入力文字の取得
+
             Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成
+            timer = null;
 
             if(buttontxt4.equals("再生")) {
-                button4.setText("停止");  //ボタンに名「停止」に変更
+//              Handler handler = new Handler(); //エラーとなるためコメントアウト
                 long period = 2; //タイマーの秒数をローカル変数として宣言
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        cursor.moveToNext();
-                        setImageURI();
+                        button4.post(new Runnable(){
+                            public void run() {
+                                cursor.moveToNext();
+                                setImageURI();
+                                button4.setText("停止");  //ボタンに名「停止」に変更
+                                return;
+                            }
+                        });
                     }
                 }, null, period);
             }else{
