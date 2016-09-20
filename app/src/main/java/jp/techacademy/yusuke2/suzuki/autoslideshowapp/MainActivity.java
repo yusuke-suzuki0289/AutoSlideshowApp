@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     int judge = 0; //判定用変数
     private Cursor cursor; //メンバ変数として宣言
-    Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成
+//    Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -112,35 +112,52 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             setImageURI();
 
         } else if (judge == 2) {
-            cursor.moveToNext();
-            setImageURI();
+            if(cursor.isLast () == true) {
+                cursor.moveToFirst();
+            }else{
+                cursor.moveToNext();
+            }
+                setImageURI();
 
         } else if (judge == 3) {
-            cursor.moveToPrevious();
+            if(cursor.isFirst () == true) {
+                cursor.moveToLast();
+            }else{
+                cursor.moveToPrevious();
+            }
             setImageURI();
 
         } else if (judge == 4) {
             String buttontxt4 = button4.getText().toString(); //入力文字の取得
-
-//            Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成　→　クリックされる時点ではインスタンス生成されないため、MainActivity配下に移動
-
+            Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成　→　クリックされる時点ではインスタンス生成されないため、MainActivity配下に移動
             if(buttontxt4.equals("再生")) {
 //              Handler handler = new Handler(); //エラーとなるためコメントアウト
                 long period = 2; //タイマーの秒数をローカル変数として宣言
-                button4.setText("停止");  //ボタンに名「停止」に変更
-                timer.schedule(new TimerTask() {
+                button1.setEnabled(false);//ボタン1無効化
+                button2.setEnabled(false);//ボタン2無効化
+                button3.setEnabled(false);//ボタン3無効化
+                button4.setText("停止");  //ボタン4の名称を「停止」に変更
+                    timer.schedule(new TimerTask() {
                     @Override
-                    public void run() {
-                        button4.post(new Runnable(){
-                            public void run() {
-                                cursor.moveToNext();
-                                setImageURI();
-                                return;
-                            }
-                        });
-                    }
-                }, 0, period);
+                        public void run() {
+                            button4.post(new Runnable() {
+                                public void run() {
+                                    if (cursor.isLast() == true) {
+                                        cursor.moveToFirst();
+                                    } else {
+                                        cursor.moveToNext();
+                                    }
+                                    setImageURI();
+                                    return;
+                                }
+                            });
+                        }
+                    },2, period);
             }else{
+                button1.setEnabled(true);//ボタン1無効化
+                button2.setEnabled(true);//ボタン2無効化
+                button3.setEnabled(true);//ボタン3無効化
+                button4.setText("再生");  //ボタン名「再生」に変更
                 timer.cancel();
             }
         }
