@@ -167,41 +167,53 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
             //再生ボタンが押された場合
         } else if (v.getId() == R.id.button4) {
             judge = 4;
+            long period;
             Button button1 = (Button) findViewById(R.id.button1);
             Button button2 = (Button) findViewById(R.id.button2);
             Button button3 = (Button) findViewById(R.id.button3);
             final Button button4 = (Button) findViewById(R.id.button4);
 
             String buttontxt4 = button4.getText().toString(); //入力文字の取得
-//            Timer timer = new Timer(); //停止の場合にtimer.cancel();を使用したいため、ここでインスタンス生成　→　クリックされる時点ではインスタンス生成されないため、MainActivity配下に移動
-            if(buttontxt4.equals("再生")) {
-//              Handler handler = new Handler(); //エラーとなるためコメントアウト
-                long period = 2; //タイマーの秒数をローカル変数として宣言
+
+            if (buttontxt4.equals("再生")) {
+                period = 2000; //タイマーの秒数をローカル変数として宣言(ミリ秒単位で設定要)
                 button1.setEnabled(false);//ボタン1無効化
                 button2.setEnabled(false);//ボタン2無効化
                 button3.setEnabled(false);//ボタン3無効化
                 button4.setText("停止");  //ボタン4の名称を「停止」に変更
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        button4.post(new Runnable() {
-                            public void run() {
-                                getContentsInfo();
-                                return;
-                            }
-                        });
-                    }
-                },2, period);
+
+                if(timer == null) {
+                    timer = new Timer(); //タイマーの生成
+                    timer.schedule(new TimerTask() {    //スケジュールの実行
+                        @Override
+                        public void run() {
+                            button4.post(new Runnable() {
+                                public void run() {
+                                    getContentsInfo();
+                                    return;
+                                }
+                            });
+                        }
+                    }, 0, period);
+
+                }else{
+                    Log.d("javatest", "タイマーの処理不正が発生。");
+                }
             }else{
+                period = 0;
+                if(timer != null){
+                    timer.cancel();
+                    timer = null;
+                }
                 button1.setEnabled(true);//ボタン1無効化
                 button2.setEnabled(true);//ボタン2無効化
                 button3.setEnabled(true);//ボタン3無効化
                 button4.setText("再生");  //ボタン名「再生」に変更
-                timer.cancel();
+
             }
             getContentsInfo();
-            Log.d("javatest","ボタン４");
-        }
+            Log.d("javatest", "ボタン４");
+            }
 
     }
 
